@@ -1,6 +1,6 @@
 
 # About the project
 
-Introduction to Open Data Science (IODS) course at University of Helsinki, Spring 2017
+THis project directory is for the course Introduction to Open Data Science (IODS)  at University of Helsinki, Spring 2017
 
 [Here](http://https://github.com/ldaniel2016/IODS-project)  is  my github directory for the IODS project
