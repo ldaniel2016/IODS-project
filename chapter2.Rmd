@@ -5,11 +5,13 @@
 
 ### Week 2
 - Registered for the course
-- Read the course pages [IODS course page] (https://courses.helsinki.fi/78995/115961424) and [IODS at MOOC UH] (https://mooc.helsinki.fi/course/view.php?id=52#section-1)
-- Installed R and rstudio
+- Read the course pages [IODS course page] (https://courses.helsinki.fi/78995/115961424) and [IODS at MOOC UH] (https://mooc.helsinki.fi/course/view.php?id=52#section-1
 - Created the github directory and diary for the IODS project
 - Forked the IODS project page to my local github directory
 - Created the README.Rmd, chapter1.Rmd, chapter2.Rmd and index.Rmd files
+- Changed the theme of the html pages
 - Commited the above files to my github IODS project repository
+- Submitted the RStudio exercise1
+- Attended the workshop on 26.1.2017
 
 
