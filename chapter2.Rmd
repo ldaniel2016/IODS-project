@@ -13,5 +13,6 @@
 - Commited the above files to my github IODS project repository
 - Submitted the RStudio exercise1
 - Attended the workshop on 26.1.2017
+- Completed the Rsudio exercise 1
 
 
