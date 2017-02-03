@@ -1,0 +1,17 @@
+# Week 2: Rstudio Exercise 2 -  Regression and model validation
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The data, learn2014, is created using the R script in the Data wrangling exercise from the original data  learning2014 available at http://www.helsinki.fi/~kvehkala/JYTmooc/JYTOPKYS3-data.txt
+
+
+ ```
+ # The structure of the dataframe learn2014 is
+ str(learn2014)
+ ```
+  ```{r}
+ source('lm_learning2014.R')
+ ```
+ ```{r}

@@ -1,0 +1,17 @@
+---
+title: "README.Rmd"
+author: "Laila Daniel"
+date: "January 25, 2017"
+output: html_document
+---
+
+
+## Introduction to Open Data Science (IODS), Spring 2017
+
+This is a massive open online course (MOOC) offered by the University of Helsinki in Spring 2017. 
+
+The aim of this course is to make a student understand the principles and advantages of using open research tools with open data and to understand the possibilities of reproducible research. The course helps the student to use R, RStudio, RMarkdown, and GitHub for these tasks and also helps to  know how to learn more of these open software tools. The course enables the student to apply certain statistical methods of data science, that is, data-driven statistics. (Adapted from the [course introduction](https://courses.helsinki.fi/78995/115961424))
+
+[IODS-directory](https://github.com/ldaniel2016/IODS-project)  is  my github directory for the IODS project
+
+[IODS-diary](https://ldaniel2016.github.io/IODS-project/)  is  my github diary for the IODS project

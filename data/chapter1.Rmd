@@ -1,0 +1,8 @@
+
+# About the IODS project
+
+This project directory is for the course, Introduction to Open Data Science (IODS)  at University of Helsinki, Spring 2017
+
+[IODS-directory](https://github.com/ldaniel2016/IODS-project)  is  my github directory for the IODS project
+
+[IODS-diary](https://ldaniel2016.github.io/IODS-project/)  is  my github diary for the IODS project
