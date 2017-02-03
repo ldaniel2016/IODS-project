@@ -34,7 +34,7 @@ p
 # model fitting with three variables.
 # The three variables which have highest absolute correlation values with 
 # points are chosen from the plot p. These variables are attitude, stra and surf.
-# The summary of my_model3 gives
+# The summary of my_model_var3 gives
 # Residual standard error: 5.296 on 162 degrees of freedom
 # Multiple R-squared:  0.2074,	Adjusted R-squared:  0.1927 
 # F-statistic: 14.13 on 3 and 162 DF,  p-value: 3.156e-08
