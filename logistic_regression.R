@@ -57,6 +57,16 @@ g +  geom_point()
 # tabulate the target variable versus the predictions
 table(high_use = alc$high_use, prediction = alc$prediction) %>% prop.table %>% addmargins
 
+# initialize a plot of 'high_use' versus 'probability' in 'alc'
+g <- ggplot(alc, aes(x = probability, y = high_use))
+g +  geom_point()
+# define the geom as points and draw the plot
+g <- ggplot(alc, aes(x = probability, y = high_use, col = prediction))
+g +  geom_point()
+# tabulate the target variable versus the predictions
+table(high_use = alc$high_use, prediction = alc$prediction) %>% prop.table %>% addmargins
+
+
 loss_func <- function(class, prob) {
   n_wrong <- abs(class - prob) > 0.5
   mean(n_wrong)
@@ -138,3 +148,20 @@ alc_vars <- c("absences", "failures" , "sex", "goout", "famrel", "G3","freetime"
               "schoolsup", "famsup","paid","activities","higher","romantic")
 
 
+
+
+m <- glm(high_use ~ goout + failures + absences + sex, data = alc, family = "binomial")
+
+# compute odds ratios (OR)
+OR <- coef(m) %>% exp
+
+# compute confidence intervals (CI)
+CI <- confint(m) %>% exp
+
+# print out the odds ratios with their confidence intervals
+cbind(OR, CI)
+
+m1 <- glm(high_use ~ goout + failures + absences + sex, data = alc, family = "binomial")
+m2 <- glm(high_use ~ goout + failures + absences , data = alc, family = "binomial")
+
+anova(m1, m2, test="LRT")

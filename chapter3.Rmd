@@ -8,7 +8,7 @@ The data from two questionnaires related to student alcohol consumption availabl
 The purpose of our analysis is to study the relationships between high/low alcohol consumption and some of the other variables in the data.
 
 ## The alc dataset
-Using the program create_alc.R we joined the above two datsets to a new datset alc. The alc data set has two new columns alc_use, which is the average of weeklday and weekend alcohol consumption and another column high_use which is true if alc_use > 2. This dataset is also available [here](http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/alc.txt)
+Using the program create_alc.R we joined the above two datsets to a new datset alc. The alc data set has two new columns alc_use, which is the average of weekday and weekend alcohol consumption and another column high_use which is true if alc_use > 2. This dataset is also available [here](http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/alc.txt)
 
 
 ### The attributes of alc dataframe
@@ -50,6 +50,7 @@ Using the program create_alc.R we joined the above two datsets to a new datset a
 34. alc_use  - average of weekday and weekend alcohol consumption
 35. high_use is True if alc_use > 2
 
+### 2. Reading the data to alc from amzonaws
 ```{r echo=TRUE}
 alc <- read.table("http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/alc.txt", 
                   sep = ",", header=TRUE)
@@ -62,6 +63,8 @@ The alc dataframe has 382 observations of 35 variables. The data is collected fr
 The goal  of this analysis is to find the relationship between "high_use" which is the predictand and the other variables in the dataset alc.
 We can use gather() to gather columns into key-value pairs and then glimpse() at the resulting data.
 We can see the distribution of the variables by  drawing  a bar plot using ggplot.
+
+
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 library(tidyr); library(dplyr); library(ggplot2); library(GGally)
@@ -138,7 +141,7 @@ g2 <- ggplot(alc, aes(x = high_use, y = Mjob, col = sex))
 # define the plot as a boxplot and draw it
 g2 + geom_boxplot() + ylab("Mjob") + ggtitle("Student mother's job by alcohol consumption and sex" )
 ```
-We can observe that "mother's job" does not have any impact on the high_use of alcohol.
+We can observe that the Mjob  does not have any impact on the high_use of alcohol.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 # initialise a plot of high_use and failures
@@ -147,10 +150,12 @@ g2 <- ggplot(alc, aes(x = high_use, y = failures, col = sex))
 g2 + geom_boxplot() + ylab("failures") + ggtitle("Student failures by alcohol consumption and sex" )
 ```
 
+The above graph shows that student failures are affected by alcohol consumption for male students.
 
 So we select the variables, "sex"", "goout", "absences", failures as the impotant variables for our analysis.
+In otherwords we take predictand high_use and the explanatory variables are sex, gout, absences and failures.
 
-### Find the model with glm()
+### Find the model with glm() for logistic regression
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 m <- glm(high_use ~ goout + failures + absences + sex, data = alc, family = "binomial")
 
@@ -162,5 +167,48 @@ CI <- confint(m) %>% exp
 
 # print out the odds ratios with their confidence intervals
 cbind(OR, CI)
+cbind
+summary(m)
 ```
 
+The odds ratio OR measures the extend to which an explanatory variable influesnces the prediction of the predictand "high_use". An OR value close to 1 signifies minimal influence whereas a higher OR value indicates a large influence. So we can see from our results that 
+sex and gout have higher OR values than failures and absences. 
+
+From the confidence interval values, we observe that sexM (male) has the largest confidence interval. The difference between 25 percentile and 97.5 percentile values is around 3. The confidence interval values follows a decreasing order for goout, failures and absences.  Both OR and Confidence interval show that sex and gout influences the predictand "high_use" compared to failures and absences.
+
+To see the significance of the categorical predictor variable sex which has two factors male and female, we do the likelyhood test.
+We generate two models m1 and m2 where the model m1 includes the variable sex and model m2 does not include the variable sex.
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+m1 <- glm(high_use ~ goout + failures + absences + sex, data = alc, family = "binomial")
+m2 <- glm(high_use ~ goout + failures + absences , data = alc, family = "binomial")
+
+anova(m1, m2, test="LRT")
+```
+
+The likelihood ratio test shows that the variable  sex is highly significant and we include it in the model.
+
+### 6. predictive power of the model
+Logistic regression gives binary predictions. The predict() function can be used to make predictions with a model object. Here we use the data alc to make the predictions for the predictand "high_use".
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+m <- glm(high_use ~ goout + failures + absences + sex, data = alc, family = "binomial")
+# predict() the probability of high_use
+probabilities <- predict(m, type = "response")
+
+# add the predicted probabilities to 'alc'
+alc <- mutate(alc, probability = probabilities)
+
+# use the probabilities to make a prediction of high_use
+alc <- mutate(alc, prediction = probability > 0.5)
+
+# tabulate the target variable versus the predictions
+table(high_use = alc$high_use, prediction = alc$prediction)
+
+```
+
+
+Actually the high_use variable for the data alc has 270 FALSE values and 112 TRUE values. We apply  logistic prediction using our model to the data alc,  the table above shows the predictions for the  variable "high_use.
+When high_use is false, the prediction states it is false for 251 and wrongly predict (gives TRUE) for 19 variables. Similarly when high_use is TRUE, 62 predictions state that it is FALSE and 50 state it is TRUE.
+
+g <- ggplot(alc, aes(x = probability, y = high_use))
+g +  geom_point()
