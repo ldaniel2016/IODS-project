@@ -208,7 +208,16 @@ table(high_use = alc$high_use, prediction = alc$prediction)
 
 
 Actually the high_use variable for the data alc has 270 FALSE values and 112 TRUE values. We apply  logistic prediction using our model to the data alc,  the table above shows the predictions for the  variable "high_use.
-When high_use is false, the prediction states it is false for 251 and wrongly predict (gives TRUE) for 19 variables. Similarly when high_use is TRUE, 62 predictions state that it is FALSE and 50 state it is TRUE.
+When high_use is false, the prediction states it is false for 251 and wrongly predict (gives TRUE) for 19 variables. Similarly when high_use is TRUE, 62 predictions state that it is FALSE and 50 state it is TRUE. We can see these results graphically.
 
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# initialize a plot of 'high_use' versus 'probability' in 'alc'
 g <- ggplot(alc, aes(x = probability, y = high_use))
 g +  geom_point()
+# define the geom as points and draw the plot
+g <- ggplot(alc, aes(x = probability, y = high_use, col = prediction))
+g +  geom_point()
+# tabulate the target variable versus the predictions
+table(high_use = alc$high_use, prediction = alc$prediction) %>% prop.table %>% addmargins
+```
+
