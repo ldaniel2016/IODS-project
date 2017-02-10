@@ -1,21 +1,14 @@
----
-title: "Logistic regression"
-author: "ldaniel2016"
-date: "February 10, 2017"
-output: html_document
----
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+# Week 3: Rstudio Exercise 3- Logistic Regression
 
-# The datasets on student alcohol consumption in secondary school students in Portugal
-In this section we are going to analyse the data from two questionnaires related to student alcohol consumption available at UCI Machine Learning Repository, [Student Alcohol consumption data page](https://archive.ics.uci.edu/ml/datasets/STUDENT+ALCOHOL+CONSUMPTION). The data consists of answers to two questionaires, one from math class and another from protugese class related to student alcohol consumption in secondary school students in Portugal.
+In this section we are analysing the datasets on student alcohol consumption in secondary school students in Portugal using Logistic regression.
+
+The data from two questionnaires related to student alcohol consumption available at UCI Machine Learning Repository, [Student Alcohol consumption data page](https://archive.ics.uci.edu/ml/datasets/STUDENT+ALCOHOL+CONSUMPTION). The data consists of answers to two questionaires, one from math class and another from protugese class related to student alcohol consumption in secondary school students in Portugal.
 
 The purpose of our analysis is to study the relationships between high/low alcohol consumption and some of the other variables in the data.
 
 ## The alc dataset
-Using the program create_alc.R we joined the above two datsets to a new datset alc. The alc data set has two new columns alc_use, which is the average of weeklday and weekend alcohol consumption and another column high_use which is true if alc_use > 2. This dataset is also available at http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/alc.txt.
+Using the program create_alc.R we joined the above two datsets to a new datset alc. The alc data set has two new columns alc_use, which is the average of weeklday and weekend alcohol consumption and another column high_use which is true if alc_use > 2. This dataset is also available [here](http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/alc.txt)
 
 
 ### The attributes of alc dataframe
@@ -66,9 +59,7 @@ summary(alc)
 
 The alc dataframe has 382 observations of 35 variables. The data is collected from 2 schools in Portugal from 382 students of which 198 are females and 184 are male students. The age of the students are ranging from 15 to 22. The variable 'alc_use' is the average of weekdays and weekend alcohol consumption and "high_use" is true if alc_use > 2. 
 
-**The goal  of this analysis is to find the relationship between "high_use" which is the predictand and the other variables in the dataset 'alc'.**
-
-
+The goal  of this analysis is to find the relationship between "high_use" which is the predictand and the other variables in the dataset alc.
 We can use gather() to gather columns into key-value pairs and then glimpse() at the resulting data.
 We can see the distribution of the variables by  drawing  a bar plot using ggplot.
 
@@ -138,6 +129,7 @@ g2 <- ggplot(alc, aes(x = high_use, y = reason, col = sex))
 g2 + geom_boxplot() + ylab("reason") + ggtitle("Student reason to a select a school by alcohol consumption and sex" )
 ```
 
+
 We can observe that "reason to select a school" does not have any impact on the high_use of alcohol.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
@@ -148,4 +140,27 @@ g2 + geom_boxplot() + ylab("Mjob") + ggtitle("Student mother's job by alcohol co
 ```
 We can observe that "mother's job" does not have any impact on the high_use of alcohol.
 
-So we select the variables, "sex"", "goout", "absences", "G3" as the impotant variables for our analysis.
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# initialise a plot of high_use and failures
+g2 <- ggplot(alc, aes(x = high_use, y = failures, col = sex))
+# define the plot as a boxplot and draw it
+g2 + geom_boxplot() + ylab("failures") + ggtitle("Student failures by alcohol consumption and sex" )
+```
+
+
+So we select the variables, "sex"", "goout", "absences", failures as the impotant variables for our analysis.
+
+### Find the model with glm()
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+m <- glm(high_use ~ goout + failures + absences + sex, data = alc, family = "binomial")
+
+# compute odds ratios (OR)
+OR <- coef(m) %>% exp
+
+# compute confidence intervals (CI)
+CI <- confint(m) %>% exp
+
+# print out the odds ratios with their confidence intervals
+cbind(OR, CI)
+```
+
