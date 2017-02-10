@@ -242,3 +242,71 @@ In the Datacamp exercise, When high_use is false, the prediction states it is fa
 
 So my model is better than Datacamp exercise model
 
+
+ 
+### 7. Cross validation
+
+Cross validation with k folds divides the dataset into k partitions. Each time it uses k-1 partition for trainining and one partition for test. This repeats in a round robin fashion
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# K-fold cross-validation
+library(boot)
+loss_func <- function(class, prob) {
+  n_wrong <- abs(class - prob) > 0.5
+  mean(n_wrong)
+}
+m<- glm(high_use ~ goout + failures + absences + sex, data = alc, family = "binomial")
+# cross validation with K with the rownumber of alc. that means training takes n-1 rows of alc and test takes 1 row if the total number of rows are n
+cv <- cv.glm(data = alc, cost = loss_func, glmfit = m, K = nrow(alc))
+
+# average number of wrong predictions in the cross validation
+cv$delta[1]
+# 10-fold cross validation
+cv<- cv.glm(data = alc, cost = loss_func, glmfit = m, K = 10)
+cv$delta[1]
+```
+
+We get the average number of wrong predictions in the cross validation as 0.2565
+
+### Perform cross-validation to compare the performance of different logistic regression models
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+cv.vars <- NULL
+
+alc_vars <- c("sex", "absences", "failures" , "goout", "famrel", "G3","freetime","health", "school", 
+              "age","address","famsize","Pstatus","Medu","Fedu",
+              "Mjob","Fjob","reason","nursery","internet","guardian","traveltime","studytime",
+              "schoolsup", "famsup","paid","activities","higher","romantic")
+
+
+library(boot)
+loss_func <- function(class, prob) {
+  n_wrong <- abs(class - prob) > 0.5
+  mean(n_wrong)
+}
+for (i in 1:29) {
+PredictorVariables <- paste(alc_vars[1:i], sep="")
+
+formula_Vars <- formula(paste("high_use ~ ", 
+                         paste(PredictorVariables, collapse=" + ")))
+
+
+m <- glm(formula_Vars, data = alc, family = "binomial")
+
+
+# compute the average number of wrong predictions in the (training) data
+
+loss_func(class = alc$high_use, prob = alc$probability)
+
+# K-fold cross-validation
+
+# 10-fold cross validation
+cv<- cv.glm(data = alc, cost = loss_func, glmfit = m, K = 10)
+
+cv$delta[1]
+cv.vars <- rbind(cv.vars, cv$delta[1])
+}
+
+plot(cv.vars)
+```
+The result show that the logostic regression with the following 11 variables
+"sex", "absences", "failures" , "goout", "famrel", "G3","freetime","health", "school", "age","address" has the lowest number of wrong predictions or loss rate 0.209.
