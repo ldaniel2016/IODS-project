@@ -35,7 +35,7 @@ CI <- confint(m) %>% exp
 # print out the odds ratios with their confidence intervals
 cbind(OR, CI)
 
-
+m <- glm(high_use ~ failures + absences  + sex, data = alc, family = "binomial")
 # predict() the probability of high_use
 probabilities <- predict(m, type = "response")
 

@@ -208,7 +208,8 @@ table(high_use = alc$high_use, prediction = alc$prediction)
 
 
 Actually the high_use variable for the data alc has 270 FALSE values and 112 TRUE values. We apply  logistic prediction using our model to the data alc,  the table above shows the predictions for the  variable "high_use.
-When high_use is false, the prediction states it is false for 251 and wrongly predict (gives TRUE) for 19 variables. Similarly when high_use is TRUE, 62 predictions state that it is FALSE and 50 state it is TRUE. We can see these results graphically.
+When high_use is false, the prediction states it is false for 251 and wrongly predict (gives TRUE) for 19 variables. Similarly when high_use is TRUE, 62 predictions state that it is FALSE and 50 state it is TRUE.We  can see that the predictions for False values of high_use, the prediction is fairly accurate. For true values of high_use, the prediction below 50 %. We can see these results graphically.
+
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 # initialize a plot of 'high_use' versus 'probability' in 'alc'
@@ -220,4 +221,24 @@ g +  geom_point()
 # tabulate the target variable versus the predictions
 table(high_use = alc$high_use, prediction = alc$prediction) %>% prop.table %>% addmargins
 ```
+
+In the Datacamp exercise where we take th model with only failure, absences and sex variables we get the following prediction for high_use
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+# fit the model
+m <- glm(high_use ~ failures + absences + sex, data = alc, family = "binomial")
+probabilities <- predict(m, type = "response")
+
+# add the predicted probabilities to 'alc'
+alc <- mutate(alc, probability = probabilities)
+
+# use the probabilities to make a prediction of high_use
+alc <- mutate(alc, prediction = probability > 0.5)
+
+# tabulate the target variable versus the predictions
+table(high_use = alc$high_use, prediction = alc$prediction)
+```
+
+In the Datacamp exercise, When high_use is false, the prediction states it is false for 258 and wrongly predict (gives TRUE) for 12 variables. Similarly when high_use is TRUE,82 predictions state that it is FALSE and 26 state it is TRUE. We  can see that the predictions for False values of high_use, the prediction is fairly accurate. For true values of high_use, the predict is rather poor. 
+
+So my model is better than Datacamp exercise model
 
