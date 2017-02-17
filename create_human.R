@@ -1,5 +1,7 @@
 # Laila Daniel.  Data Wrangling for exercise 5 - Dimensionality Reduction
 
+# Create a dataset "human" from the human_development and gender ineqaulity datasets.
+
 # Read the “Human development” and “Gender inequality” data into R.
 
 hd <- read.csv("http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/human_development.csv", stringsAsFactors = F)
