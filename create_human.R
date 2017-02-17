@@ -1,6 +1,6 @@
 # Laila Daniel.  Data Wrangling for exercise 5 - Dimensionality Reduction
 
-# Create a dataset "human" from the human_development and gender ineqaulity datasets.
+# Create a dataset "human" from the human_development and gender inequality datasets.
 
 # Read the “Human development” and “Gender inequality” data into R.
 
