@@ -1,4 +1,4 @@
-# Data Wrangling for exercise 5 - Dimensionality Reduction
+# Laila Daniel.  Data Wrangling for exercise 5 - Dimensionality Reduction
 
 # Read the “Human development” and “Gender inequality” datas into R.
 
@@ -11,8 +11,9 @@ dim(hd)
 str(gii)
 dim(gii)
 
-hd.save <- hd
-gii.save <- gii
+
+
+# Rename the columns of hd and gii with shorter names
 
 colnames(hd) <- c("hdir", "country", "hdi", "le", "exp.edu", "mean.edu", "gni","gnir-hdir")
 colnames(gii) <- c("giir", "country", "gii", "mmr", "abr", "prp", "edu2F", "edu2M", "labF", "labM")
