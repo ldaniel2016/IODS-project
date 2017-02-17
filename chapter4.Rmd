@@ -365,7 +365,7 @@ plot(lda.fit.cluster, dimen = 2, col = classes, pch = classes)
 lda.arrows(lda.fit.cluster, myscale = 2)
 ```
 
-### 9.  model predictors and lda.fit$scaling for the "crime variable" and cluster 
+### 9.model predictors and lda.fit$scaling for the "crime variable" and cluster 
 
 Here we get a 3-d plot with LD1 in the x axis, Ld2 in y-axis and LD3 in the z-axis.
 lda.fit$scaling aa matrix which transforms observations to discriminant functions, normalized so that within groups covariance matrix is spherical. The plot shows the classification based on the crime variable. We can see that there is some overlap between low, medium low and medium high crime classes,
