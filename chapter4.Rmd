@@ -266,48 +266,58 @@ table(correct = correct_classes, predicted = lda.pred$class)
 
 ```
 
-### Kmeans algorithm
+### 7. K-means algorithm
 
-K-means algorithm is one of the simplest clustering algorithm. 
+K-means algorithm is one of the simplest clustering algorithm.  It partions n observations into k clusters. The clustering policy is that each observation belongs to the cluster with nearest mean. This is an unsupervised learning algorithm.
+
+The k-means algorithm is an iterative algorithm and it works as follows. Initially we define k centroids for the k clusters. Take each observation (point) in the data set and associate it with a centroid for which the euclidean distance between the observation and the centroid is the least. When all the observations are associated with their own centroids, the first iteration step is over. Now re calculate the centroids and reassociate the points to the new centroids. These iteration steps continue till the centroids do not change anymore.
+
+
+Now we perform the K-means clustering on the Boston dataset. We scale the dataset and calculate the distance matrix by finding the euclidean diatance between the variables. We determine the number of clusters by plotting the  the total of within cluster sum of squares (WCSS) behaves when the number of cluster changes.
 ```{r echo=TRUE}
 # access the MASS package
 library(MASS)
-
+library(GGally)
+library(ggplot2)
 # load the data
 data("Boston")
 
 # center and standardize variables
 boston_scaled <- scale(Boston)
+
 # euclidean distance matrix
-dist_eu <- dist(Boston)
+dist_eu <- dist(boston_scaled)
 
 # look at the summary of the distances
 summary(dist_eu)
 
-# MASS, ggplot2 and Boston dataset are available
+# set a seed value which enables to repeat the kmeans() function with the 
+# same initial clusters. Otherwise the initial clusters may be assigned randomly.
 set.seed(123)
 
-# euclidean distance matrix
-dist_eu <- dist(Boston)
-
 # determine the number of clusters
-k_max <- 10
+k_max <- 15
 
 # calculate the total within sum of squares
 twcss <- sapply(1:k_max, function(k){kmeans(dist_eu, k)$tot.withinss})
-
+twcss
 # visualize the results
 plot(1:k_max, twcss, type='b')
 
 # Kmeans algorithm
-km <-kmeans(dist_eu, centers = 2)
+km <-kmeans(dist_eu, centers = 4)
 
 # plot the Boston dataset with clusters
-pairs(Boston, col = km$cluster)
+
+boston_scaled_df <- as.data.frame(boston_scaled)
+pairs(boston_scaled)
+pairs(boston_scaled, col = km$cluster)
+p <- ggpairs(boston_scaled_df, aes(col=km$cluster), lower = list(combo = wrap("facethist", bins = 20))) + ggtitle("k-means clustering of Boston(scaled) dataset")
+#ggpairs(Boston, col = km$cluster)
 
 ```
 
-### kmeans with clusters
+### 8. K- means on Boston data with clusters
 
 
 ```{r echo=TRUE}
@@ -337,7 +347,7 @@ lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "red", tex = 0
 classes <- as.numeric(cluster_boston$km.cluster)
 # plot the lda results
 plot(lda.fit.cluster, dimen = 2, col = classes, pch = classes)
-lda.arrows(lda.fit.cluster, myscale = 1)
+lda.arrows(lda.fit.cluster, myscale = 1.5)
 ```
 
 ```{r echo=TRUE}
@@ -350,5 +360,5 @@ dim(lda.fit$scaling)
 matrix_product <- as.matrix(model_predictors) %*% lda.fit$scaling
 matrix_product <- as.data.frame(matrix_product)
 library(plotly)
-plot_ly(x = matrix_product$LD1, y = matrix_product$LD2, z = matrix_product$LD3, type= 'scatter3d', mode='markers')
+plot_ly(x = matrix_product$LD1, y = matrix_product$LD2, z = matrix_product$LD3, type= 'scatter3d', mode='markers', color = train$crime)
 ```
