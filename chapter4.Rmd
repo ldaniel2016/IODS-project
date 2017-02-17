@@ -1,22 +1,354 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
 
+## RStudio Exercise 4: Clustering
 
+The fourth Rstudio exercise is on clustering. The data we use for this exercise is the Boston data from the MASS package.
+The [Boston dataset](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/Boston.html) deals with the housing values in the suburbs of Boston.
 
-## R Markdown
+### 2. Boston dataset
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+The attributes (variables) of the Boston data are the following:
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+1. crim - per capita crime rate by town.
+2. zn - proportion of residential land zoned for lots over 25,000 sq.ft.
+3. indus - proportion of non-retail business acres per town.
+4. chas - Charles River dummy variable (= 1 if tract bounds river; 0 otherwise).
+5. nox - nitrogen oxides concentration (parts per 10 million).
+6. rm -  average number of rooms per dwelling.
+7. age - proportion of owner-occupied units built prior to 1940.
+8. dis - weighted mean of distances to five Boston employment centres.
+9. rad - index of accessibility to radial highways.
+10. tax - full-value property-tax rate per \$10,000.
+11. ptratio - pupil-teacher ratio by town.
+12. black - 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town.
+14. lstat - lower status of the population (percent).
+15. medv - median value of owner-occupied homes in \$1000s.
 
-```{r cars}
-summary(cars)
+```{r echo=TRUE}
+# access the MASS package
+library(MASS)
+
+# load the data
+data("Boston")
+
+# explore the dataset
+str(Boston)
+
+table(is.na(Boston))
+
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+The Boston dataset has 506 observations of 14 variables. The datset has no missing values or NAs.
+The summary gives the minimum, median, maximum and the quartile values of the variables of the Boston dataset.
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+
+### 3. Graphical overview and the Summaries of the  Boston dataset
+
+We use the correlation between the variables of the data. We create a corr_matrix by using the cor() function on Boston data. To visualize the correlation we use the corr_plot funtion from the corr_plot package. As the correlation matrix is symmetric we need only upper or lower matrix. Here we get the correlation as numbers. 
+
+```{r echo=TRUE}
+library(corrplot); library(dplyr)
+cor_matrix<-cor(Boston) %>% round(digits=2)
+
+# visualize the correlation matrix
+corrplot(cor_matrix, method="number", type = "upper", cl.pos = "b", tl.pos = "d", tl.cex = 0.6)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+We can observe that the variable "crim"(percapita crime rate by town) has a high correlation to "rad" (index of accessibility  to radial highways). Also a high correlation (0.) between "indus" (non retail business acres may be industrial places) to "nox" nitrogen oxide.  Also "nox"" and "zn" (residential lands zoned for lots)  and so on.
+
+
+Tyhe summary gives the quartiles, minimum and maximum values of the variables in the Boston dataset.
+
+```{r echo=TRUE}
+summary(Boston)
+```
+
+
+
+
+#### crim: Percapita  crime rate by town
+```{r echo=TRUE}
+library(ggplot2)
+qplot(Boston$crim, geom = "histogram", binwidth = 1, main = "percapita crime rate", xlab = "crim", col = I("grey"), fill = I("chartreuse3"))
+```
+
+The plot shows percapita crime rate per town. This plot will be more understandable we if we categorise the crime variable using the quantiles.
+In a later plot we can see this categorization.
+
+```{r echo=TRUE}
+g1 <- ggplot(Boston, aes(x = zn, group = zn, y = dis))
+g1 + geom_boxplot()
+```
+
+
+
+#### age: proportion of owner-occupied units built prior to 1940
+```{r echo=TRUE}
+qplot(Boston$age, geom = "histogram", binwidth = 1, main = "proportion of owner-occupied units built prior to 1940", xlab = "years", col = I("grey"), fill = I("orange"))
+```
+
+#### dis - weighted mean of distances to five Boston employment centres
+
+```{r echo=TRUE}
+
+qplot(Boston$age, geom = "histogram", binwidth = 1, main = "mean distance to five Boston employment centres", xlab = "Kms", col = I("grey"), fill = I("blue"))
+```
+
+
+#### ptratio - pupil-teacher ratio by town.
+
+```{r echo=TRUE}
+
+qplot(Boston$age, geom = "histogram", binwidth = 1, main = "pupil-teacher ratio by town", xlab = "ratio", col = I("coral"), fill = I("orange"))
+```
+
+### Scatter plots and distributions
+```{r echo=TRUE}
+library (ggplot2)
+library (GGally)
+ggpairs(Boston, mapping = aes(), lower = list(combo = wrap("facethist", bins = 20))) + ggtitle("Matrix of scatter plots and distributions")
+```
+
+### Scaling the Boston data
+
+Since the variables of Boston data set has quite different range for their values for.ex : rm (number of rooms) and tx (full value tax rate) we scale the data. For scaling we subtract the column means from the corresponding columns and divide the difference with standard deviation.
+Sacling makes the variables normally distributed and each variable has the same variance. Later when we do the linear discriminant anlaysis, the requirement on the data is that all the variables in the data are normally distributed and they should have the same variance. We can see that in the scaled version of Boston data which is in boston_scaled, the values of all the variables have comparable ranges. The boston_scaled is a matrix and we change it to a dataframe from easily accessing the variables. 
+
+```{r echo=TRUE}
+# center and standardize variables
+boston_scaled <- scale(Boston)
+
+# summaries of the scaled variables
+summary(boston_scaled)
+
+# class of the boston_scaled object
+class(boston_scaled)
+
+# change the matrix object boston_scaled to a data frame
+boston_scaled <- as.data.frame(boston_scaled)
+```
+
+
+####  Create a categorical variable for crime 
+
+The crim variable will be better understood if we make it as a categorical variable based on its quantile values. We cut the variable crim by its quantiles to four categories, namely low, med_low, med_high and high. 
+
+```{r echo=TRUE}
+# save the scaled crim as scaled_crim
+scaled_crim <- boston_scaled$crim
+
+# create a quantile vector of crim and print it
+bins <- quantile(scaled_crim)
+bins
+
+# create a categorical variable 'crime'
+crime <- cut(scaled_crim, breaks = bins, include.lowest = TRUE, labels = c("low", "med_low", "med_high", "high"))
+
+# look at the table of the new factor crime
+
+crime
+# remove original crim from the dataset
+boston_scaled <- dplyr::select(boston_scaled, -crim)
+
+# add the new categorical value to scaled data
+boston_scaled <- data.frame(boston_scaled, crime)
+```
+
+### Create train and test data from boston_scaled
+```{r echo=TRUE}
+# number of rows in the Boston dataset 
+n <- nrow(boston_scaled)
+
+# choose randomly 80% of the rows
+ind <- sample(n,  size = n * 0.8)
+
+# create train set
+train <- boston_scaled[ind,]
+
+# create test set 
+test <- boston_scaled[-ind,]
+
+# save the correct classes from test data
+correct_classes <- test$crime
+
+# remove the crime variable from test data
+test <- dplyr::select(test, -crime)
+```
+
+### Linear Discriminent analysis (LDA)
+LDA is a classification method. So it is supervised learning. Logistic regression is a binary classification algorithm, whereas LDA can classify into multiple classes. In our problem the predictand "crime" has  four categorical variables and with LDA, we train the model first with the predictors in the train set and then predict the test data into various crime categories.
+
+```{r echo=TRUE}
+lda.fit <- lda(crime ~., data = train)
+
+# print the lda.fit object
+lda.fit
+```
+
+The Linear Discriminant classification on the boston_scaled data in to four categorical levels  of the variable crime is summarized by the model lda.fit. Basically LDA is Bayes classifier. The prior probabilities of the goups(categorical levels of crime variable) are given. 
+
+The group means of the predictor variables are also shown.
+As there are four groups in the classifier we have three linear discriminants (LD1, LD2 and LD3) and the coefficient of LDs for each of the predictor variables are given.  The proportion of trace indicates that 94.7 % of the variance is explained by LD1 followed by LD2 and LD3 explain 3.8 % and 1.4 % respectively.
+
+
+The LDA biplot plots the coefficents of the predictor variables as a function of LDs. In the plot shown here we plot the coefficients of the predictor variables as a function of LD1 and LD2. The variable "rad"(index of accessibility to radial highways) has the highest value (3.2) with LD1 and we can see from the plot that "rad" has the largest length arrow in the LD1 direction. 
+
+From the plot of LD1 vs LD2 we can see that we can clearly distinguish the "high_crime rate" from "low" and "medium_low". A few "med_high" comes with "high".  
+
+```{r echo=TRUE}
+# the function for lda biplot arrows
+lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "red", tex = 0.75, choices = c(1,2)){
+  heads <- coef(x)
+  arrows(x0 = 0, y0 = 0, 
+         x1 = myscale * heads[,choices[1]], 
+         y1 = myscale * heads[,choices[2]], col=color, length = arrow_heads)
+  text(myscale * heads[,choices], labels = row.names(heads), 
+       cex = tex, col=color, pos=3)
+}
+# target classes as numeric
+classes <- as.numeric(train$crime)
+# plot the lda results
+plot(lda.fit, dimen = 2, col = classes, pch = classes)
+lda.arrows(lda.fit, myscale = 1)
+
+```
+
+We also plotted  LD1, LD2 and LD3 by changing the dimen variable in the above code to 3.
+Now we can see 6  biplots of LD1, LD2 and LD3. When we plot LD2 vs LD3, the crime levels cannot be distinguished as LD2 and LD3 explains only about 5 % of the variance. I do not understand why the arrows are not shown in the biplora plots except LD3 vs LD3
+```{r echo=TRUE}
+# the function for lda biplot arrows
+lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "red", tex = 0.75, choices = c(1,2)){
+  heads <- coef(x)
+  arrows(x0 = 0, y0 = 0, 
+         x1 = myscale * heads[,choices[1]], 
+         y1 = myscale * heads[,choices[2]],col=color, length = arrow_heads)
+  text(myscale * heads[,choices], labels = row.names(heads), 
+       cex = tex, col=color, pos=3)
+}
+# target classes as numeric
+classes <- as.numeric(train$crime)
+# plot the lda results
+plot(lda.fit, dimen = 3, col = classes, pch = classes)
+lda.arrows(lda.fit, myscale = 0.25)
+
+```
+
+We also have the biplots based on the method given in the [stackoverflow answer] (http://stackoverflow.com/questions/17232251/how-can-i-plot-a-biplot-for-lda-in-r/17240647#17240647)
+
+```{r echo=TRUE}
+#install.packages("devtools")
+#library(devtools)
+#install_github("fawda123/ggord")
+library(ggord)
+ord <- lda(crime ~., data = train, prior = rep(1, 4)/4)
+ggord(ord, train$crime)
+```
+
+### LDA prediction
+
+lda.fit is our LDA model and using that model we can see how the model classifies the test data in to different classes  of the categorical variable "crime". 
+
+Recall that when we partioned the data into train and test data, we saved the test$crime (actually the observations) in the variable "correct classes". 
+
+From the table of correct classes  and the predicted ones, we can see that the predictor correly classifies into "high" crime class 28 out of 29 test observations. For the "medium_high"" test observations, there is almost half probability that they will be classified into "medium_low". The "medium_low"s are classified correctly with a probability 13/27 and "low"s are correctly classified with a probability 13/22. In my view, a somewhat ok classifier as "high"s are clearly distinguished from the other classes.
+
+```{r echo=TRUE}
+# predict classes with test data
+lda.pred <- predict(lda.fit, newdata = test)
+
+# cross tabulate the results
+table(correct = correct_classes, predicted = lda.pred$class)
+
+```
+
+### Kmeans algorithm
+
+K-means algorithm is one of the simplest clustering algorithm. 
+```{r echo=TRUE}
+# access the MASS package
+library(MASS)
+
+# load the data
+data("Boston")
+
+# center and standardize variables
+boston_scaled <- scale(Boston)
+# euclidean distance matrix
+dist_eu <- dist(Boston)
+
+# look at the summary of the distances
+summary(dist_eu)
+
+# MASS, ggplot2 and Boston dataset are available
+set.seed(123)
+
+# euclidean distance matrix
+dist_eu <- dist(Boston)
+
+# determine the number of clusters
+k_max <- 10
+
+# calculate the total within sum of squares
+twcss <- sapply(1:k_max, function(k){kmeans(dist_eu, k)$tot.withinss})
+
+# visualize the results
+plot(1:k_max, twcss, type='b')
+
+# Kmeans algorithm
+km <-kmeans(dist_eu, centers = 2)
+
+# plot the Boston dataset with clusters
+pairs(Boston, col = km$cluster)
+
+```
+
+### kmeans with clusters
+
+
+```{r echo=TRUE}
+library(MASS)
+
+# load the data
+data("Boston")
+
+# center and standardize variables
+boston_scaled <- scale(Boston)
+km <-kmeans(boston_scaled, centers = 4)
+cluster_boston <- data.frame(km$cluster, boston_scaled)
+lda.fit.cluster <- lda(km.cluster~., data = cluster_boston)
+# print the lda.fit object
+lda.fit.cluster
+
+# the function for lda biplot arrows
+lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "red", tex = 0.75, choices = c(1,2)){
+  heads <- coef(x)
+  arrows(x0 = 0, y0 = 0, 
+         x1 = myscale * heads[,choices[1]], 
+         y1 = myscale * heads[,choices[2]], col=color, length = arrow_heads)
+  text(myscale * heads[,choices], labels = row.names(heads), 
+       cex = tex, col=color, pos=3)
+}
+# target classes as numeric
+classes <- as.numeric(cluster_boston$km.cluster)
+# plot the lda results
+plot(lda.fit.cluster, dimen = 2, col = classes, pch = classes)
+lda.arrows(lda.fit.cluster, myscale = 1)
+```
+
+```{r echo=TRUE}
+model_predictors <- dplyr::select(train, -crime)
+# check the dimensions
+dim(model_predictors)
+dim(lda.fit$scaling)
+
+# matrix multiplication
+matrix_product <- as.matrix(model_predictors) %*% lda.fit$scaling
+matrix_product <- as.data.frame(matrix_product)
+library(plotly)
+plot_ly(x = matrix_product$LD1, y = matrix_product$LD2, z = matrix_product$LD3, type= 'scatter3d', mode='markers')
+```
