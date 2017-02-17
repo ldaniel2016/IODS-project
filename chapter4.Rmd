@@ -289,15 +289,12 @@ The twcss varies from 748534.8 to 79854.73 for k = 1 to 15.  We take k = 6 as op
 
 #### Clustering using K-means algorithm
 
-K-means clustering algorithm invoked here will place each of the observations in 4 clusters
+K-means clustering algorithm invoked here will place each of the observations in 6 clusters as we have given the centers as 6.
 
 ```{r echo=TRUE}
 # Kmeans algorithm
 km <-kmeans(dist_eu, centers = 6)
 
-# plot the Boston dataset with clusters
-
-boston_scaled_df <- as.data.frame(boston_scaled)
 
 # the clustering information
 km
@@ -310,8 +307,13 @@ K-means mimimizes the within cluster sum of squares (the dispersion in each grou
 
 
 #### Visualization of clusters on the boston_scaled data
-Here we can see the paiwise plot of the clusters  and the variables.
-```{r echo=TRUE}
+To have fewer colours  for visualization we again do the k-means algorithm with k = 4.
+Here we can see the pairwise plot of the clusters  and the variables. The pair plot shows what is the representation of different clusters when we plot the observations pair-wise. For example, when we plot "crim" with "rad" only red and blue clusters are presnet and they are well separated, wheras the plot of age with dis the clusters are not well separated.
+
+
+ ```{r echo=TRUE}
+# Kmeans algorithm
+km <-kmeans(dist_eu, centers = 4)
 
 pairs(boston_scaled, col = km$cluster)
 
@@ -365,7 +367,8 @@ lda.arrows(lda.fit.cluster, myscale = 2)
 
 9. ###  model predictors and lda.fit$scaling for the "crime variable"
 
-
+Here we get a 3-d plot with LD1 in the x axis, Ld2 in y-axis and LD3 in the z-axis.
+lda.fit$scaling aa matrix which transforms observations to discriminant functions, normalized so that within groups covariance matrix is spherical. The plot shows the classification based on the crime variable. We can see that there is some overlap between low, medium low and medium high crime classes,
 ```{r echo=TRUE}
 model_predictors <- dplyr::select(train, -crime)
 # check the dimensions
@@ -380,7 +383,10 @@ plot_ly(x = matrix_product$LD1, y = matrix_product$LD2, z = matrix_product$LD3, 
 ```
  ####  model predictors and lda.fit.cluster$scaling for the "cluster variable"
 
-We use the cluster_boston data set and use the lda.fit.cluster the model we trainedwhen the predictand is the  km$cluster obtained from the kmeans algorithm.
+We call the scaled Boston data set  added with cluster as the first column as cluster_boston. We use the cluster_boston data set /which as 506 rows and 15 columns) for the linear discriminant analysis.  We get lda.fit.cluster as the lda model we trained when the predictand is the  km$cluster obtained from the kmeans algorithm.
+
+The plot shows the four clusters. They are quite well separated. 
+
 
 ```{r echo=TRUE}
 model_predictors <- dplyr::select(cluster_boston, -km.cluster)
