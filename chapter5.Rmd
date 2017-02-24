@@ -4,8 +4,7 @@ In this exercise we study the dimensionality reduction techniques namely, princi
 multiple correspondence analysis (MCA).
 
 The data "human" we use in this exercise is obtained  from the United Nations Development Programme. For a detailed information about the data is available [here](http://hdr.undp.org/en/content/human-development-index-hdi).
-The "human" dataframe has 155 observations of 8 variables. The rowname of each observation row 
-is the name of the Country associated with that observation.
+The "human" dataframe has 155 observations of 8 variables. The rowname of each observation is the name of the Country associated with that observation.
 
 The variables of the "human" dataframe
 
@@ -18,11 +17,12 @@ The variables of the "human" dataframe
 7. "Edu2.FM" = Edu2.F / Edu2.M
 8. "Labo.FM" = Labo2.F / Labo2.M
 
+
+"Edu2.F" and "Edu2.M" are the proportion of females  and males with at least secondary education. Edu2.FM is a derived variable which is the ratio of females with secondary education(Edu2.F) to males with secondary education(Edu2.M). So Edu2.FM = Edu2.F/Edu2.M.
+
+"Labo.M "and "Labo.F"  are the proportion of females and males in the labour force.  "Labo.FM" is the ratio of  Labo2.F / Labo2.M. 
+
 Note:  "Edu2.F" and "Edu2.M" and "Labo.F" and "Labo.M""  were in the original UNDP dataset available at http://hdr.undp.org/en/content/human-development-index-hdi. 
-
-"Edu2.F" and "Edu2.M" are the proportion of females  and males with at least secondary education. Edu2. FM is a derived variable which is the ratio of Edu2.F/Edu2.M.
-
-"Labo.M "and "Labo.F"  are the proportion of females and males in the labour force.  "Labo.FM" is the ratio of  Labo2.F / Labo2.M. I am using the names given by T Tuomo Nieminen (2017) for the variables. 
 
 ### 1. Load the "human" data into R
 I have the "human.csv" file is also in my github data directory https://github.com/ldaniel2016/IODS-project/blob/master/data/human.csv
@@ -36,14 +36,18 @@ str(human)
 
 ### 2. Graphical overview and summaries of "human" dataframe
 
-
+#### Summary of the variables 
 The summary of the human data gives the quartiles, minimum and maximum values of the variables in the human dataset.
 
 ```{r echo=TRUE}
 summary(human)
 ```
 
+#### Correlation between the variables 
+
 We use the correlation between the variables of the data. We create a corr_matrix by using the cor() function on human data. To visualize the correlation we use the corr_plot function from the corr_plot package. As the correlation matrix is symmetric we need only upper or lower matrix. Here we get the correlation as numbers. 
+
+We can see that there is a high correlation of GNI with life expectancy and expected level of schooling. Also Maternal mortality and adolescent birth rates are strongly correlated.
 
 ```{r, warning=FALSE, message=F, echo=TRUE}
 library(corrplot); library(dplyr)
@@ -52,20 +56,30 @@ cor_matrix<-cor(human) %>% round(digits=2)
 # visualize the correlation matrix
 corrplot(cor_matrix, method="number", type = "upper", cl.pos = "b", tl.pos = "d", tl.cex = 0.6)
 ```
-#### Scatter plots and distributions
 
-Here is another way of showing the distributions of the variables and the correlation between pairs using the ggpairs function.
+#### Scatter plots and distributions
+Here is another way of showing the distributions of the variables and the correlation between pairs using the ggpairs function. From the scatter plots of the variables we can see that Edu.FM, the ratio of secondary school education for women and men is highly skewed.  The Edu.Exp, the expected years of schooling is  a normal variable with a mean of 13 yrs.
+
+ It is very interesting to see that GNI is a very skewed variable, there is a high variation in the "wealth" of nations.
+
 ```{r, warning=FALSE, message=F, echo=TRUE}
 library (ggplot2)
 library (GGally)
 ggpairs(human, mapping = aes(), lower = list(combo = wrap("facethist", bins = 20))) + ggtitle("Matrix of scatter plots and distributions")
 ```
-### Principal Component Analysis (PCA)
+
+### 3. Principal Component Analysis (PCA)
+
 Principal Component Analysis (PCA) is a statistical procedure that uses an orthogonal transformation to convert a set of observations of possibly correlated variables into a set of values of linearly uncorrelated variables called principal components (Wikipedia). PCA transforms the data in terms of  the eigenvalues and eigenvectors of the data.  In other words, we can define PCA as a statistical procedure on a data set with large number of variables that yields a smaller number of uncorrelated variables called principal components with which we  can explain the maximum amount of variance in the data. The first component explains the highest variance, followed by the second and so on. The dimension of the data  is the number of variables or attributes associated with the data. The number of uncorrelated (orthogonal) components are less than or equal to the number of original variables. So PCA "approximates" the behaviour of the data with fewer principal components so it is a dimensionality reduction technique.
 
 For PCA, I use the prcomp function available in R. The prcomp() function uses the SVD (singular value decomposition) which gives a more  numerically accurate method. SVD decomposes a data matrix into a product of smaller matrices, and then  extract the underlying principal components. 
 
-#### PCA  on non_standardised human data with svd method.
+
+### 4.  PCA  on non_standardized and standardized  human data with svd method
+
+We perform and analyse PCA non_standardized and standardized  human data.
+
+#### PCA  on non_standardized human data with svd method.
 
 First we do the pca on the human data which is not standardized. So the range of values of the observations vary widely. For example, in the case of Norway, the GNI variable has a value 64992 whereas Edu2.FM is 1.007.
 
@@ -75,17 +89,20 @@ pca_human_not_std$rotation gives the matrix of variable loading. The columns of 
 
 
 ```{r, warning=FALSE, message=F, echo=TRUE}
+# Perform PCA using prcomp
 pca_human_not_std <- prcomp(human)
 ```
 
-* Summary of pca_human_not_std
+
+##### Summary of pca_human_not_std
 
 ```{r, warning=FALSE, message=F, echo=TRUE}
 summary(pca_human_not_std)
 pca_human_not_std$rotation
 
 ```
-* Biplot of pca_human_not_std
+
+#####  Biplot of pca_human_not_std
 
 A biplot  visualizes the connection between two representations of the same data. First a simple scatter plot is drawn which shows the observations represented by two highest valued principal components (PC1 and PC2). Then arrows are drawn to give the connection between the variables of the data  and the PCs. The angle between the variables can be interpreted as the correlation between the variables. The angle between the a variable and a PC axis can be interpreted as the correlation between them. The length of the arrows are proportional to the standard deviation of the variables.
 
@@ -101,7 +118,7 @@ biplot(pca_human_not_std, choices = 1:2, cex = c(0.6,1), col = c("grey40", "deep
 ```
 
 
-### PCA  on standardized human data with svd method
+#### PCA  on standardized human data with svd method
 
 We standardize the variables of "human" data by subtracting the mean from each column and dividing the difference with standard deviation. This can be achieved in R by the scale() function.
 
@@ -113,17 +130,23 @@ pca_human_std$x gives each observations in terms of the PCA components
 For example, To the country, Norway, how much PC1 to PC8 are contributing to the variance. 
 
 ```{r, warning=FALSE, message=F, echo=TRUE}
+# We standardize the human data
 human_std <- scale(human)
+
+# Perform PCA with prcomp
 pca_human_std <- prcomp(human_std)
+```
+
+##### Summary of pca_human_std
+```{r, warning=FALSE, message=F, echo=TRUE}
 summary(pca_human_std)
 pca_human_std$rotation
 head(pca_human_std$x)
- 
 
 ```
 
 
-* Biplot of pca_human_std
+#####  Biplot of pca_human_std
 
 The bipolar plot shows the correlations between the variables and the principal components. We can observe from the biplot that Edu2.FM (Ratio of secondary level education of females to males), Edu.Exp (Expected years of schooling), Life.Exp (life expectancy at birth ), GNI (Gross National Income per capita) are highly correlated variables and they are along the negative PC1 axis.  
 Mat.Mor (Maternal mortality ratio), Ado.Birth (Adolescent birth rate) are also highly correlated variables that lie in the positive direction of PC1. 
@@ -142,7 +165,8 @@ pc_lab <- paste0(names(pca_pr), " (", pca_pr, "%)")
 biplot(pca_human_std, choices = 1:2, cex = c(0.6,1), col = c("grey40", "deeppink2"), xlab = pc_lab[1], ylab = pc_lab[2])
 ```
 
-* Circle of correlations
+
+##### Circle of correlations
 
 We can have a separate plot of correlations of the variables and PC1 and PC2. This gives the same visualization as biplot without the observations.
 
@@ -174,9 +198,10 @@ ggplot() + geom_path(data = corcir, aes(x = x, y = y), colour = "gray65") +
     y = "PC2") + ggtitle("Circle of correlations")
     
 ```
-* Plot of Countries (observations) vs Principal Components PC1 and PC2
 
-Here we plot the Countries vs PC1 and PC2. We can see that the left upper corner of the plot has countries with high PC1 and PC2 values. These countries have high human development index. 
+##### Plot of Countries (observations) vs Principal Components PC1 and PC2
+
+Here we plot the Countries vs PC1 and PC2. We can see that the left upper corner of the plot has countries with high PC1 and PC2 values. These countries have high human development index. The countries with low HDI are at the lower right corner of the graph.
 
 
 ```{r, warning=FALSE, message=F, echo=TRUE}
@@ -191,17 +216,23 @@ ggplot(data = scores, aes(x = PC1, y = PC2, label = rownames(scores))) +
   ggtitle("PCA plot of Countries")
 ```
 
-#### Analysis results on PCA on "human" data
+### 5. Analysis results on PCA on "human" data
 
 With the Human Development index (HDI)  and Gender Inequality Index (GII) data  we created the "human" data. We selected the variables Edu2.FM (Ratio of secondary level education of females to males), Labo.FM (Ratio of labour force participation of females to males),  Edu.Exp(Expected years of schooling), Life.Exp (Life expectancy at birth), GNI(Gross National Income per capita), Mat.Mor(Maternal mortality rate), Ado.Birth(Adolescent birth rate), Parli.F (Percetange of female representatives in parliament).
 
-Results of the PCA on "human" data shows that the countries with high HDI index have 
-not only high or moderate GNI but also have high level of Education, life expectancy, high education for women, high representation of women in the parliament. We can see that countries with low HD1 have high maternal mortality rate, adolescent birth rate, low education levels.
+We analysed the summary of the PCA analysis on standardized human data and we plotted many graphs to highlight the correlation between variables and the two principal components PC1 and PC2.
+
+PC1 has high negative correlation with Edu.Exp, Edu.FM, Life.Exp and GNI. PC1 has high positive correlation with Mat.Mor and Ado.Birth. Parli.F and Labo.FM are almost orthogonal to PC1 and and they have high correlation with PC2. PC1 explains 53.6 % of the variance whereas PC2 explains 16.2 % variance. So together they explain about 70 % of the variance.
+
+Results of the PCA on "human" data shows that the countries with high HDI index have not only high or moderate GNI but also have high level of Education, life expectancy, high education for women, high representation of women in the parliament. We can see that countries with low HD1 have high maternal mortality rate, adolescent birth rate, low education levels.
+
+Countries have high human development index are at the left upper part of the PCA biplot and the countries with low HDI are at the lower right corner of the PCA biplot.
 
 We can observe that in the case of the "Scandinavian"" countries (Norway, Finland, Sweden and Denmark), even though their GNI differ, they enjoy a high HDI rank as the education system in these countries are quite good, they give equal opportunities to women and men and also good health facilities are provided for the citizens. 
 
+In my opinion, a  lot of improvement in HDI can be obtained if the "World" gives importance to education, health and gender equality. 
 
-### 6. MCA anlaysis on tea dataset
+### 6. Multiple correspondence analysis (MCA)  anlaysis on tea dataset
 
 Multiple correspondence analysis (MCA) is an extension of correspondence analysis (CA) which allows one to analyze the pattern of relationships of several categorical dependent variables. It can be seen as a generalization of principal component analysis  (PCA) when the variables to be analyzed are categorical instead of quantitative (continuous). 
 
@@ -217,6 +248,7 @@ library(tidyr)
 data(tea)
 str(tea)
 ```
+
 #### Active variables, quantitative variables and qualilative supplementary variables of tea dataset
 
 The tea data set has 300 observations of 36 variables. The first 18 variables are active variables and they are categorical variables. So the dimensions  of MCA will be restricted to this first 18 variables. The rest of the variables are used to understand and interpret the dimensions.
@@ -263,19 +295,22 @@ summary(mca)
 ```
 
 #### Plotting mca
-* MCA plot with only active categories
+
+##### MCA plot with only active categories
 
 Here we plot the active categories, selecting the 20 most contributed ones. The unselected are shown in gray.
+
 ```{r, warning=FALSE, message=F, echo=TRUE}
 plot(mca, invisible = c("ind", "quali.sup"),cex = 0.8, selectMod="contrib 20", unselect = "gray 30")
 ```
 
-* MCA plot with only the categories of the qualitative supplementary variables
+##### MCA plot with only the categories of the qualitative supplementary variables
 
 ```{r, warning=FALSE, message=F, echo=TRUE}
 plot(mca, invisible = c("var","ind"),cex = 0.8)
 ```
-* MCA plot with only the active categories  and individuals
+
+##### MCA plot with only the active categories  and individuals
 
 Here we plot the active categories and the 10 individuals who contribute the most to the two dimensions.
 We select only the active categories and the individuals whose cos2 value is greater than 0.1 (well represented)
@@ -284,7 +319,7 @@ We select only the active categories and the individuals whose cos2 value is gre
 plot(mca, invisible = c("quali.sup"),cex = 0.6, selectMod = "cos2 0.1", select="contrib 10")
 ```
 
-* MCA plot with different colour for individual's tea habits. 
+##### MCA plot with different colour for individual's tea habits. 
 
 The plot  shows in individuals who drink tea once per day, one to two times per week and so on. 
 We can see that there are more green dots which shows many people drink tea two times a day.
