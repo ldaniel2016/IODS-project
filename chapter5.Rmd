@@ -1,7 +1,7 @@
 ## RStudio Exercise 5: Dimensionality reduction techniques
 
 In this exercise we study the dimensionality reduction techniques namely, principal component analysis (PCA) and 
-multiple correspondance analysis (MCA).
+multiple correspondence analysis (MCA).
 
 The data "human" we use in this exercise is obtained  from the United Nations Development Programme. For a detailed information about the data is available [here](http://hdr.undp.org/en/content/human-development-index-hdi).
 The "human" dataframe has 155 observations of 8 variables. The rowname of each observation row 
@@ -37,13 +37,13 @@ str(human)
 ### 2. Graphical overview and summaries of "human" dataframe
 
 
-The summary of the human data gives the quartiles, minimum and maximum values of the variables in thehuman dataset.
+The summary of the human data gives the quartiles, minimum and maximum values of the variables in the human dataset.
 
 ```{r echo=TRUE}
 summary(human)
 ```
 
-We use the correlation between the variables of the data. We create a corr_matrix by using the cor() function on human data. To visualize the correlation we use the corr_plot funtion from the corr_plot package. As the correlation matrix is symmetric we need only upper or lower matrix. Here we get the correlation as numbers. 
+We use the correlation between the variables of the data. We create a corr_matrix by using the cor() function on human data. To visualize the correlation we use the corr_plot function from the corr_plot package. As the correlation matrix is symmetric we need only upper or lower matrix. Here we get the correlation as numbers. 
 
 ```{r, warning=FALSE, message=F, echo=TRUE}
 library(corrplot); library(dplyr)
@@ -61,17 +61,17 @@ library (GGally)
 ggpairs(human, mapping = aes(), lower = list(combo = wrap("facethist", bins = 20))) + ggtitle("Matrix of scatter plots and distributions")
 ```
 ### Principal Component Analysis (PCA)
-Principal Component Analysis (PCA) is a statistical procedure that uses an orthogonal transformation to convert a set of observations of possibly correlated variables into a set of values of linearly uncorrelated variables called principal components (Wikipedia). PCA transforms the data in terms of  the eigenvalues and eigenvectors of the data.  In other words, we can define PCA as a statistical procedure on a data set with large number of variables that yields a smaller number of uncorrelated variables called principal components with which we  can explain the maximum amount of variance in the data. The first component explians the highest variance, followed by the second and so on. The dimension of the data  is the number of variables or attributes associated with the data. The number of uncorrelated (orthogonal) components are less than or equal to the number of original variables. So PCA "approximates" the behaviour of the data with fewer principal components so it is a dimensionality reduction technique.
+Principal Component Analysis (PCA) is a statistical procedure that uses an orthogonal transformation to convert a set of observations of possibly correlated variables into a set of values of linearly uncorrelated variables called principal components (Wikipedia). PCA transforms the data in terms of  the eigenvalues and eigenvectors of the data.  In other words, we can define PCA as a statistical procedure on a data set with large number of variables that yields a smaller number of uncorrelated variables called principal components with which we  can explain the maximum amount of variance in the data. The first component explains the highest variance, followed by the second and so on. The dimension of the data  is the number of variables or attributes associated with the data. The number of uncorrelated (orthogonal) components are less than or equal to the number of original variables. So PCA "approximates" the behaviour of the data with fewer principal components so it is a dimensionality reduction technique.
 
 For PCA, I use the prcomp function available in R. The prcomp() function uses the SVD (singular value decomposition) which gives a more  numerically accurate method. SVD decomposes a data matrix into a product of smaller matrices, and then  extract the underlying principal components. 
 
 #### PCA  on non_standardised human data with svd method.
 
-First we do the pca on the human data which is not standarized. So the range of values of the observations vary widely. For example, in the case of Norway, the GNI variable has a value 64992 whereas Edu2.FM is 1.007.
+First we do the pca on the human data which is not standardized. So the range of values of the observations vary widely. For example, in the case of Norway, the GNI variable has a value 64992 whereas Edu2.FM is 1.007.
 
-prcomp function on unscaled "human" data returns pca_human_not_std. summary(pca_human_not_std) shows the impotance of components. We can see that there is a wide variation in the standard deviation of the PC1 (1.84e+04) and the other components. PC1 explains 99.99 % of variance and PC2 0.01 % of the variance. There are no  contribution by the components  PC2 to PC8. 
+prcomp function on unscaled "human" data returns pca_human_not_std. summary(pca_human_not_std) shows the importance of components. We can see that there is a wide variation in the standard deviation of the PC1 (1.84e+04) and the other components. PC1 explains 99.99 % of variance and PC2 0.01 % of the variance. There are no  contribution by the components  PC2 to PC8. 
 
-pca_human_not_std$rotation gives the matrix of variable loading. The columns of the matrix are the PCs (eigenvectors) and how each variable is composed of these principal components. We can see from this matrix that GNI has the highest component of PC1. This is because GNI is about 10000 times larger than the other variables.  Not standardizing the variables results in a very "strong" first principal component which contributes about 100 % to the variance and the contribution of the rest of the components almost nil.  The result clearly shows that we need to standardise the variables before doing PCA. 
+pca_human_not_std$rotation gives the matrix of variable loading. The columns of the matrix are the PCs (eigenvectors) and how each variable is composed of these principal components. We can see from this matrix that GNI has the highest component of PC1. This is because GNI is about 10000 times larger than the other variables.  Not standardizing the variables results in a very "strong" first principal component which contributes about 100 % to the variance and the contribution of the rest of the components almost nil.  The result clearly shows that we need to standardize the variables before doing PCA. 
 
 
 ```{r, warning=FALSE, message=F, echo=TRUE}
@@ -103,21 +103,20 @@ biplot(pca_human_not_std, choices = 1:2, cex = c(0.6,1), col = c("grey40", "deep
 
 ### PCA  on standardized human data with svd method
 
-We standardise the variables of "human" data by subtracting the mean from each column and dividing the difference with standard deviation. This can be achieved in R by the scale() function.
+We standardize the variables of "human" data by subtracting the mean from each column and dividing the difference with standard deviation. This can be achieved in R by the scale() function.
 
 We can see from the importance of components that PC1 contributes to 53.6 % of the variance, PC2 contributes 16 % of the variance and the PC3 to PC8 contribute the rest about 30 % of the variance. 
 
 pca_human_std$rotation  gives the matrix of variable loading. The columns of the matrix are the PCs (eigenvectors) and how each variable is composed of these principal components. 
 
 pca_human_std$x gives each observations in terms of the PCA components
-For example, To the country, Norway, how much PC1 to PC8 are contibuting to the variance. 
+For example, To the country, Norway, how much PC1 to PC8 are contributing to the variance. 
 
 ```{r, warning=FALSE, message=F, echo=TRUE}
 human_std <- scale(human)
 pca_human_std <- prcomp(human_std)
 summary(pca_human_std)
 pca_human_std$rotation
-rownames(pca_human_std$rotation) <- c("Ratio of secondary level education of females to males", "Ratio of labour force participation of females to males",  "Expected years of schooling", "Life expectancy at birth", "Gross National Income per capita", "Maternal mortality ratio", "Adoloscent birth rate", "Percetange of female representatives in parliament" ) 
 head(pca_human_std$x)
  
 
@@ -126,8 +125,13 @@ head(pca_human_std$x)
 
 * Biplot of pca_human_std
 
-The bipolar plot shows the correlations between the variables and the principal components. We can observe from the biplot that Edu2.FM (Ratio of secondary level education of females to males), Edu.Exp (Expected years of schooling), Life.Exp (life expectancy at birth ), GNI (Gross National Income per capita) are highly correlated variables and they are along the negative PC1 axis.  Mat.Mor (Maternal mortality ratio), Ado.Birth (Adoloscent birth rate) are also highly correlated variables that lie in the positive direction of PC1. Labo.FM (labour force participation ratio of females to males) and Parli.F (Percetange of female representatives in parliament) 
- have high PC2 components than PC1. They are quite orthogonal to PC1. The plot also shows the observations (rownames of the oservations are the name of the Countries) represented by two highest valued principal components (PC1 and PC2).
+The bipolar plot shows the correlations between the variables and the principal components. We can observe from the biplot that Edu2.FM (Ratio of secondary level education of females to males), Edu.Exp (Expected years of schooling), Life.Exp (life expectancy at birth ), GNI (Gross National Income per capita) are highly correlated variables and they are along the negative PC1 axis.  
+Mat.Mor (Maternal mortality ratio), Ado.Birth (Adolescent birth rate) are also highly correlated variables that lie in the positive direction of PC1. 
+
+Labo.FM (labour force participation ratio of females to males) and Parli.F (Percetange of female representatives in parliament) have high PC2 components than PC1. They are quite orthogonal to PC1. 
+
+The plot also shows the observations (rownames of the observations are the name of the Countries) represented by two highest valued principal components (PC1 and PC2).
+
 
 ```{r, warning=FALSE, message=F, echo=TRUE}
 s <- summary(pca_human_std)
@@ -135,7 +139,7 @@ s <- summary(pca_human_std)
 pca_pr <- round(100*s$importance[2, ], digits = 2)
 # create object pc_lab to be used as axis labels
 pc_lab <- paste0(names(pca_pr), " (", pca_pr, "%)")
-biplot(pca_human_std, choices = 1:2, cex = c(0.6,1), col = c("grey40", "deeppink2"), xlab = pc_lab[1], ylab = pc_lab[2], size=0.5)
+biplot(pca_human_std, choices = 1:2, cex = c(0.6,1), col = c("grey40", "deeppink2"), xlab = pc_lab[1], ylab = pc_lab[2])
 ```
 
 * Circle of correlations
@@ -172,7 +176,7 @@ ggplot() + geom_path(data = corcir, aes(x = x, y = y), colour = "gray65") +
 ```
 * Plot of Countries (observations) vs Principal Components PC1 and PC2
 
-Here we plot the Countries vs PC1 and PC2. We can see that the left upper corner of the plot has countries with high PC1 and PC2 values. 
+Here we plot the Countries vs PC1 and PC2. We can see that the left upper corner of the plot has countries with high PC1 and PC2 values. These countries have high human development index. 
 
 
 ```{r, warning=FALSE, message=F, echo=TRUE}
@@ -187,155 +191,105 @@ ggplot(data = scores, aes(x = PC1, y = PC2, label = rownames(scores))) +
   ggtitle("PCA plot of Countries")
 ```
 
-#### Results on PCA on "human" data
+#### Analysis results on PCA on "human" data
 
-With the Human Development index (HDI)  and Gender Inequality Index (GII) data  we created the "human" data.
-We selected the variables 
+With the Human Development index (HDI)  and Gender Inequality Index (GII) data  we created the "human" data. We selected the variables Edu2.FM (Ratio of secondary level education of females to males), Labo.FM (Ratio of labour force participation of females to males),  Edu.Exp(Expected years of schooling), Life.Exp (Life expectancy at birth), GNI(Gross National Income per capita), Mat.Mor(Maternal mortality rate), Ado.Birth(Adolescent birth rate), Parli.F (Percetange of female representatives in parliament).
 
-created to emphasize that people and their capabilities should be the ultimate criteria for assessing the development of a country, not economic growth alone. The HDI can also be used to question national policy choices, asking how two countries with the same level of GNI per capita can end up with different human development outcomes. These contrasts can stimulate debate about government policy priorities.
+Results of the PCA on "human" data shows that the countries with high HDI index have 
+not only high or moderate GNI but also have high level of Education, life expectancy, high education for women, high representation of women in the parliament. We can see that countries with low HD1 have high maternal mortality rate, adolescent birth rate, low education levels.
 
-Edu2.FM, Edu.Exp, Life.Exp, GNI are highly correlated variables and they are along the negative PC1 axis.  Mat.Mor, Ado.Birth are also highly correlated variables that lie in the positive direction of PC1. Labo.FM and Parli.FM have high PC2 components than PC1.
-The Human Development Index (HDI) is a summary measure of average achievement in key dimensions of human development: a long and healthy life, being knowledgeable and have a decent standard of living. The HDI is the geometric mean of normalized indices for each of the three dimensions.
+We can observe that in the case of the "Scandinavian"" countries (Norway, Finland, Sweden and Denmark), even though their GNI differ, they enjoy a high HDI rank as the education system in these countries are quite good, they give equal opportunities to women and men and also good health facilities are provided for the citizens. 
 
-The health dimension is assessed by life expectancy at birth, the education dimension is measured by mean of years of schooling for adults aged 25 years and more and expected years of schooling for children of school entering age. The standard of living dimension is measured by gross national income per capita. The HDI uses the logarithm of income, to reflect the diminishing importance of income with increasing GNI. The scores for the three HDI dimension indices are then aggregated into a composite index using geometric mean. Refer to Technical notes for more details.
-
-The HDI simplifies and captures only part of what human development entails. It does not reflect on inequalities, poverty, human security, empowerment, etc. The HDRO offers the other composite indices as broader proxy on some of the key issues of human development, inequality, gender disparity and human poverty.
 
 ### 6. MCA anlaysis on tea dataset
 
-Multiple correspondence analysis (MCA) is an extension of correspondence analysis (CA) which allows one to analyze the pattern of
-relationships of several categorical dependent variables. It can be seen as a generalization of principal component anal-
-ysis  (PCA) when the variables to be analyzed are categorical instead of quantitative. 
+Multiple correspondence analysis (MCA) is an extension of correspondence analysis (CA) which allows one to analyze the pattern of relationships of several categorical dependent variables. It can be seen as a generalization of principal component analysis  (PCA) when the variables to be analyzed are categorical instead of quantitative (continuous). 
 
+The tea data set from FactoMineR has 300 observations on 36 variables. The dataset contains the answers of a questionnaire on tea consumption. 
 
-The tea data set from FactoMineR has 300 observations on 36 variables. The first 18 variables are active variables
-They are categorical variables. So the dimentions MCA will be restricted to this first 18 variables. The rest of the variables are used to understand and interpret the dimensions.
-The only continuous variable is variable 19, "age",  is a quantitative variable and the variables 20:36 are qualitative supplementory categorical variables.
+Here is a good video from one of the authors of FactoMineR package [MCA](https://www.youtube.com/watch?v=reG8Y9ZgcaQ)
 
-youtube [video1](https://www.youtube.com/watch?v=reG8Y9ZgcaQ) and video2
+#### Loading the tea dataset 
 ```{r, warning=FALSE, message=F, echo=TRUE}
 library(FactoMineR)
 library(dplyr)
 library(tidyr)
 data(tea)
 str(tea)
-dim(tea)
+```
+#### Active variables, quantitative variables and qualilative supplementary variables of tea dataset
+
+The tea data set has 300 observations of 36 variables. The first 18 variables are active variables and they are categorical variables. So the dimensions  of MCA will be restricted to this first 18 variables. The rest of the variables are used to understand and interpret the dimensions.
+
+The only quantitative(continuous) variable is variable 19, "age" and the variables 20:36 are qualitative supplementary categorical variables.
+
+```{r, warning=FALSE, message=F, echo=TRUE}
+colnames(tea)
 summary(tea)
 ```
 
 #### Visualization of "tea" dataset
+
+The plot of tea data set shows different categorical variables and the count (of answers) for each category. The count will be clearly seen if get the plot in a new window. 
+
+One of the active variable is "Tea" which has three categories namely, black, Earl Grey and green. Another active variable is "How", how the tea is used with the categories "alone", with "lemon", with "milk" or with "other".  
+
+The continuous variable "age" has a minimum value 15 and a maximum 90. One of the supplementary qualitative variable is "relaxing" for which around 100 people think that tea is not relaxing and around 150 think that it is relaxing.
+
 ```{r, warning=FALSE, message=F, echo=TRUE}
 gather(tea) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") +geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
 ```
-```{r, warning=FALSE, message=F, echo=TRUE}
-mca_full <- MCA(tea, quanti.sup = 19, quali.sup = 20:36, graph = FALSE )
 
-summary(mca_full)
-```
 
-The summary gives the Eigen values, the percentage of variance explained by each dimension and the cumulative % of variance. We can see that the first dimension explains 9.8 % of the variance, the second dimension 8 % and so on.
+### MCA on tea dataset
 
-Then we have see the first 10 individuals, the coordinate of the individual on first dimention, its contribution to the first dimension and then we have cos², which represents the quality of the individual on that dimension. If the cos² value is near 1, the individual is well projected on that dimension. We can see similar values for the dimension 2 and 3.
+The tea data set has 36 variables. The active variables are the first 1:18 variables. We can specify the MCA command the quantitative and the qualitative supplementary variables. We use the MCA function from FactoMineR package for the multiple correspondence analysis.
 
-Next we have the results for the categories, first the active categorical variables. The summary also shows the influence of the categorical variable on dimensions which measures the square of correlation ratio. If this value is close to 1, there is a strong raltion between the categorical variable and the dimension.
+The summary gives the eigenvalues, the percentage of variance explained by each dimension and the cumulative % of variance. We can see that the first dimension explains 9.8 % of the variance, the second dimension 8 % and so on with decreasing percentage of contributions from the rest of the  dimensions.
 
-The same results for supplementary categorical and continuous variable for different dimensions. We have only one continuous variable age and it contributes 0.2 tot eh dimension 2.
+Then we can see the first 10 individuals, the coordinate of the individual on first dimension, its contribution to the first dimension and then we have cos², which represents the quality of the individual on that dimension. If the cos² value is near 1, the individual is well projected on that dimension. We can see similar values for the dimension 2 and 3.
 
-coordinate for a categorical variable on a dimension is the squared correlation ration between the dimension and the categorical varaiable (continuous variable)
-graph of age
-graph where is strongly linked to dim1 and dim2
-graph with category
-plot(mca.full)
+Next we have the results for the categories, first the active categorical variables. The summary also shows the influence of the categorical variable on dimensions which measures the square of correlation ratio. If this value is close to 1, there is a strong correlation between the categorical variable and the dimension.
+Similar results for supplementary categorical and continuous variable for different dimensions. We have only one continuous variable age and it contributes 0.2 to the dimension 2.
 
-plot(mca_full, )
+In the MCA call if we set graph is TRUE we get four graphs (pl click on the graphs). The first is the factor map of the categories with Dim1 (dimension 1) and Dim 2. The second graph shows how the individuals are distributed with the two dimensions.  The third graph shows how the variables, active in red, qualitative supplementary variables in green and quantitative variable "age" in blue are distributed with the two dimensions. We can see that the variable "where" has a high contribution from Dim1 and Dim2. The fourth graph is a correlation circle which shows the "age" variable with a small correlation (0.204) along the dimension 2.  
 
-plot(mca, invisible = c("var", "quali.sup"))
-plot(mca, invisible = c("ind", "quali.sup"))
-plot(mca, invisible = c("ind", "quali.sup"),cex = 0.8)
-plot(mca, invisible = c("ind", "var"),cex = 0.8)
-plot(mca, invisible = c("ind", "quali.sup"),cex = 0.8, selectMod="contrib 20", unselect = "gray 30")
-plot(mca, invisible = c("ind", "quali.sup"),cex = 0.8, selectMod="cos 2", unselect = "gray 30")
-plot(mca, invisible = c("quali.sup"),cex = 0.8, selectMod="cos2 0.1", select = "contrib 10")
-plot(mca, choix="var",cex = 0.7, xlim = c(0, 0.5), ylim = c(0, 0.5))
-> > red active green sup categorical and blue continuous
-
-plot(mca, invisible = c("var","quali.sup"),habillage="frequency")
-------------------------------
-We use only some columns of the tea dataset for analysis. We use "Tea", "How", "how", "where", "sex", "breakfast", "price", "healthy" and "relaxing"
+The coordinates for a variable shown in the graph is the squared correlation ratio between the dimension and the categorical/continuous variable. 
 
 ```{r, warning=FALSE, message=F, echo=TRUE}
+mca <- MCA(tea, quanti.sup = 19, quali.sup = 20:36, graph = TRUE )
 
-# columns to keep in the new tea_time data set
-
-keep_columns <- c("Tea", "How", "how", "where", "relaxing", "dinner", "healthy", "friends")
-
-# select the 'keep_columns' to create a new dataset
-tea_time <- select(tea, one_of(keep_columns))
-
-# look at the summaries and structure of the data
-summary(tea_time)
-str(tea_time)
-```
-
-#### visulaize the tea_time dataset
-```{r, warning=FALSE, message=F, echo=TRUE}
-library(ggplot2)
-gather(tea_time) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") +geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
-```
-
-
-### MCA on tea_time data
-```{r, warning=FALSE, message=F, echo=TRUE}
-# multiple correspondence analysis
-mca <- MCA(tea_time, graph = TRUE)
-```
-
-#### summary of mca
-
-```{r, warning=FALSE, message=F, echo=TRUE}
 summary(mca)
 ```
 
+#### Plotting mca
+* MCA plot with only active categories
 
-#### visualize mca
+Here we plot the active categories, selecting the 20 most contributed ones. The unselected are shown in gray.
 ```{r, warning=FALSE, message=F, echo=TRUE}
-plot(mca, invisible=c("ind"), habillage = "quali")
+plot(mca, invisible = c("ind", "quali.sup"),cex = 0.8, selectMod="contrib 20", unselect = "gray 30")
 ```
 
-```{r, warning=FALSE, message=F, echo=TRUE}
-mca
-```
-```{r, warning=FALSE, message=F, echo=TRUE}
-mca$eig
-```
+* MCA plot with only the categories of the qualitative supplementary variables
 
 ```{r, warning=FALSE, message=F, echo=TRUE}
-# number of categories per variable
-cats = apply(tea_time, 2, function(x) nlevels(as.factor(x)))
-
-mca_vars_df = data.frame(mca$var$coord, Variable = rep(names(cats), cats))
-
-# data frame with observation coordinates
-mca_obs_df = data.frame(mca$ind$coord)
-
-# plot of variable categories
-ggplot(data=mca_vars_df, 
-       aes(x = Dim.1, y = Dim.2, label = rownames(mca_vars_df))) +
- geom_hline(yintercept = 0, colour = "gray70") +
- geom_vline(xintercept = 0, colour = "gray70") +
- geom_text(aes(colour=Variable)) +
- ggtitle("MCA plot of variables using R package FactoMineR")
+plot(mca, invisible = c("var","ind"),cex = 0.8)
 ```
+* MCA plot with only the active categories  and individuals
+
+Here we plot the active categories and the 10 individuals who contribute the most to the two dimensions.
+We select only the active categories and the individuals whose cos2 value is greater than 0.1 (well represented)
 
 ```{r, warning=FALSE, message=F, echo=TRUE}
-ggplot(data = mca_obs_df, aes(x = Dim.1, y = Dim.2)) +
-  geom_hline(yintercept = 0, colour = "gray70") +
-  geom_vline(xintercept = 0, colour = "gray70") +
-  geom_point(colour = "gray50", alpha = 0.7) +
-  geom_density2d(colour = "gray80") +
-  geom_text(data = mca_vars_df, 
-            aes(x = Dim.1, y = Dim.2, 
-                label = rownames(mca_vars_df), colour = Variable)) +
-  ggtitle("MCA plot of variables using R package FactoMineR") +
-  scale_colour_discrete(name = "Variable")
+plot(mca, invisible = c("quali.sup"),cex = 0.6, selectMod = "cos2 0.1", select="contrib 10")
 ```
+
+* MCA plot with different colour for individual's tea habits. 
+
+The plot  shows in individuals who drink tea once per day, one to two times per week and so on. 
+We can see that there are more green dots which shows many people drink tea two times a day.
+
+```{r, warning=FALSE, message=F, echo=TRUE}
+plot(mca, invisible = c("var","quali.sup"),habillage="frequency")
+```
+
