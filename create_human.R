@@ -30,3 +30,8 @@ gii <- mutate(gii, lab = labF / labM)
 
 # Create a  new dataset "human" by joining together the two datasets, hd and gii  using the variable Country as the identifier
 human <- inner_join(hd, gii, by = "country")
+
+# The "human" dataframe now has 155 observations of 8 variables.
+# write this dataframe to the file "human.csv" in the project directory
+setwd("/home/daniel/lstudies/IODS2017/IODS-project/data")
+write.csv(human, file = "human_ex4.csv", row.names = TRUE)
