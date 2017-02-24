@@ -5,8 +5,13 @@
 # The link to datawrangling exercise done as a part of exercise 4 is
 # https://github.com/ldaniel2016/IODS-project/blob/master/create_human.R
 
+# As a part of exercise 4, I created the file "human_ex4.csv"" file and is available 
+# at https://github.com/ldaniel2016/IODS-project/blob/master/data/human_ex4.csv.
+# The "human_ex4.csv" has 195 observations and 19 columns.
+
 # As the names i gave for the columns are different from the names in the meta file 
-# I use the data from the amazon aws for this exercise
+# I use the data from the amazon aws for this exercise.
+
 library(tidyr)
 library(stringr)
 library(dplyr)
@@ -14,7 +19,7 @@ library(dplyr)
 # Read the "human" data fro amazon aws
 human <- read.table("http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/human1.txt",
                     sep =",", header = T)
-# "human" databse has 195 observations of 9 variabales
+# "human" dataset has 195 observations of 9 variables
 str(human)
 dim(human)
 

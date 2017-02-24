@@ -68,16 +68,13 @@ library (GGally)
 ggpairs(human, mapping = aes(), lower = list(combo = wrap("facethist", bins = 20))) + ggtitle("Matrix of scatter plots and distributions")
 ```
 
-### 3. Principal Component Analysis (PCA)
+
+### 3. Principal Component Analysis (PCA) on ono_standardized "human" data
 
 Principal Component Analysis (PCA) is a statistical procedure that uses an orthogonal transformation to convert a set of observations of possibly correlated variables into a set of values of linearly uncorrelated variables called principal components (Wikipedia). PCA transforms the data in terms of  the eigenvalues and eigenvectors of the data.  In other words, we can define PCA as a statistical procedure on a data set with large number of variables that yields a smaller number of uncorrelated variables called principal components with which we  can explain the maximum amount of variance in the data. The first component explains the highest variance, followed by the second and so on. The dimension of the data  is the number of variables or attributes associated with the data. The number of uncorrelated (orthogonal) components are less than or equal to the number of original variables. So PCA "approximates" the behaviour of the data with fewer principal components so it is a dimensionality reduction technique.
 
 For PCA, I use the prcomp function available in R. The prcomp() function uses the SVD (singular value decomposition) which gives a more  numerically accurate method. SVD decomposes a data matrix into a product of smaller matrices, and then  extract the underlying principal components. 
 
-
-### 4.  PCA  on non_standardized and standardized  human data with svd method
-
-We perform and analyse PCA non_standardized and standardized  human data.
 
 #### PCA  on non_standardized human data with svd method.
 
@@ -118,7 +115,7 @@ biplot(pca_human_not_std, choices = 1:2, cex = c(0.6,1), col = c("grey40", "deep
 ```
 
 
-#### PCA  on standardized human data with svd method
+###4.  PCA  on standardized "human"" data with svd method
 
 We standardize the variables of "human" data by subtracting the mean from each column and dividing the difference with standard deviation. This can be achieved in R by the scale() function.
 
@@ -273,7 +270,7 @@ gather(tea) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") +geom_ba
 ```
 
 
-### MCA on tea dataset
+#### MCA on tea dataset
 
 The tea data set has 36 variables. The active variables are the first 1:18 variables. We can specify the MCA command the quantitative and the qualitative supplementary variables. We use the MCA function from FactoMineR package for the multiple correspondence analysis.
 
